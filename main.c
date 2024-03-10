@@ -1,15 +1,14 @@
 #include <stdio.h>
 #include "game_libs/libs.h" 
-#include "game_libs/struct.h"
 #include <stdlib.h>
 #include <stdbool.h> 
 #include <SDL2/SDL.h>
 #define WIDTH 800
 #define HEIGHT 600
-#define RIGHT 10 
-#define LEFT -10 
-#define UP -10 
-#define DOWN 10 
+#define RIGHT 1 
+#define LEFT -1 
+#define UP -1 
+#define DOWN 1 
 int main() {
 	SDL_Window* window; 
 	SDL_Renderer* renderer; 
@@ -34,7 +33,6 @@ int main() {
 	randomFood(&food); 
 	setUpfood(&food, renderer);	
 	SDL_RenderPresent(renderer);	
-	
 	while (true) {
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT) {
@@ -65,20 +63,20 @@ int main() {
 	SDL_RenderClear(renderer);			
 		
 	setUpfood(&food, renderer);
-	if (collission_wall(&snake) == 1) {
+	if (collission_wall(&snake) == 1) {	
 		return -1;
 	}			
-	snake.lenght += 1;  	
+	
 	if (collission_food(&snake, &food) == true) {
 		snake.lenght += 1;  	
 		randomFood(&food); 	
 		setUpfood(&food, renderer);	
 	}	
-	
+	setUpdatesnake(&snake, renderer); 
 	SDL_RenderPresent(renderer);	
 	SDL_Delay(16); 	
 	
 	}
-
+	freenode(&snake); 
 	return 0; 
 }
