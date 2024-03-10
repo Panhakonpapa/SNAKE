@@ -1,10 +1,15 @@
 #include <stdio.h>
-#include "game_lib/" 
+#include "game_libs/libs.h" 
+#include "game_libs/struct.h"
 #include <stdlib.h>
 #include <stdbool.h> 
 #include <SDL2/SDL.h>
 #define WIDTH 800
 #define HEIGHT 600
+#define RIGHT 10 
+#define LEFT -10 
+#define UP -10 
+#define DOWN 10 
 int main() {
 	SDL_Window* window; 
 	SDL_Renderer* renderer; 
@@ -17,36 +22,62 @@ int main() {
 		0
 		); 
 	renderer = SDL_CreateRenderer(window, -1, 0); 
+		
+	SDL_Event event;
+	struct Snake snake;
+	struct Food food; 
+	setUpsnake(&snake);
+
+
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);	
+	SDL_RenderClear(renderer);			
+	randomFood(&food); 
+	setUpfood(&food, renderer);	
+	SDL_RenderPresent(renderer);	
 	
-	SDL_Event event; 
-	int x = WIDTH / 2; 	
-	int y = HEIGHT / 2;
-	int velosity = 10; 
 	while (true) {
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT) {
 				return -1; 
+			} 			
+			const Uint8* KeyStates = SDL_GetKeyboardState(NULL);
+       			if (KeyStates[SDL_SCANCODE_UP]) {
+				movement(&snake, 0, UP); 
+			} 	
+       			if (KeyStates[SDL_SCANCODE_DOWN]) {
+				
+				movement(&snake, 0, DOWN); 
+
 			}
-		}		
+       			if (KeyStates[SDL_SCANCODE_RIGHT]) {
+				
+				movement(&snake, RIGHT, 0); 
+
+			}
+       			if (KeyStates[SDL_SCANCODE_LEFT]) {
+					
+				movement(&snake, LEFT, 0); 
+			} 
+		}	
+
 		
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);	
 	SDL_RenderClear(renderer);			
-	x += velosity;
-	y += velosity;	
-	if (x <= 0 || x + 50 >= WIDTH) {
-	      velosity = -velosity; 	
-	}
 		
-	if (y <= 0 || y + 50 >= HEIGHT) {
-		velosity = -velosity; 	
-	}
-	SDL_Rect pug2 = {x, y, 50, 50}; 		
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);		
-	SDL_RenderFillRect(renderer, &pug2);
+	setUpfood(&food, renderer);
+	if (collission_wall(&snake) == 1) {
+		return -1;
+	}			
+	snake.lenght += 1;  	
+	if (collission_food(&snake, &food) == true) {
+		snake.lenght += 1;  	
+		randomFood(&food); 	
+		setUpfood(&food, renderer);	
+	}	
 	
-
 	SDL_RenderPresent(renderer);	
 	SDL_Delay(16); 	
+	
 	}
 
 	return 0; 
